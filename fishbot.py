@@ -54,11 +54,6 @@ async def players(ctx):
 
 @bot.command(aliases=['suggestion', 'suggest'])
 async def pool(ctx, text):
-
-        await ctx.channel.purge(limit = 1)
-        
-        Embed = None
-        
         Embed = discord.Embed(colour = 0xFF0000)
         Embed.set_author(name=f'Pool by {ctx.message.author}', icon_url = f'{ctx.author.avatar_url}')
         Embed.add_field(name = 'They are asking: ', value = f'{text.title()}')
