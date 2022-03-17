@@ -97,6 +97,10 @@ async def RandomClass(ctx, amount: int = 3):
     
     await ctx.channel.send(text)
 
+@bot.command()
+async def wiki(ctx, page: str = 'Home'):
+    await ctx.channel.send('https://fishards.fandom.com/wiki/'+page)
+    
 #-------------------------------------------------------------------------------------------
 
 #Events
