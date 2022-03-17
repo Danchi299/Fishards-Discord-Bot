@@ -1,2 +1,3 @@
 discord
 discord-ext-bot
+requests
