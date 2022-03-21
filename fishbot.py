@@ -105,10 +105,10 @@ async def players(ctx):
 
 @bot.command(aliases=['suggestion', 'suggest', 'pool', 'vote'])
 async def poll(ctx, text):
-        text = ctx.message.content
-        
+             
         #find first space in message and add everything after it to variable
         #because passing variables trough commands is wired
+        text = ctx.message.content
         text = text[text.find(" "):] 
         
         Embed = discord.Embed(colour = 0xFF0000)
@@ -159,9 +159,14 @@ async def randomclass(ctx, amount: int = 3):
     await ctx.channel.send(text)
 
 #prints class/spell name based on sent emojis
-@bot.command(aliases=['defind','search','class','spell','name'])
+@bot.command(aliases=['defind','search','class','spell','name','f'])
 async def find(ctx, text: str = '<:fire_element:848956850875793440><:water_element:848956903270121483><:earth_element:848956867357966346>'):
     global elements_emoji, classes
+    
+    #find first space in message and add everything after it to variable
+    #because passing variables trough commands is wired
+    text = ctx.message.content
+    text = text[text.find(" "):]
     
     old_text = text
     
