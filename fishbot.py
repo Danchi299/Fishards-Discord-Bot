@@ -53,8 +53,11 @@ classes = {
 "134": "Snipin Snyder",
 "234": "Hidin' Harry",
 
-"0123": "The Last Fishbender",
-"0134": "Double Trouble",
+"0123": "Lasting Bender".
+"0124": "Explosive Michael",
+"0134": "Troublesome Jessy",
+"0234": "Scary Walter",
+"1234": "Crazy Fred",
     
 "01234": "Sensei",
 }
@@ -168,7 +171,7 @@ async def find(ctx, text: str = '<:fire_element:848956850875793440><:water_eleme
     text = ctx.message.content
     text = text[text.find(" "):]
     
-    old_text = text
+    old_text = text.replace(" ", "")
     
     #split emojis into list
     text = text.replace('><', '> <')
