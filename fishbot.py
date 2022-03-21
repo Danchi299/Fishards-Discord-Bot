@@ -174,12 +174,12 @@ async def find(ctx, text: str = '<:fire_element:848956850875793440><:water_eleme
     
     #complare emojis from list with saved emoji list\
     for element in text:
-    i = -1
-    for emoji in elements_emoji:
-        i += 1
-        if element == emoji:
-            fclass += str(i) #save element numbers to variable
-    
+        i = -1
+        for emoji in elements_emoji:
+            i += 1
+            if element == emoji:
+                fclass += str(i) #save element numbers to variable
+
     #Send Class Name if it exist
     try: await ctx.channel.send(f'{classes[fclass]} {old_text}')  
     except KeyError: await ctx.channel.send(f"{old_text} Not Found")
