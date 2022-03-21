@@ -53,7 +53,7 @@ classes = {
 "134": "Snipin Snyder",
 "234": "Hidin' Harry",
 
-"0123": "Lasting Bender".
+"0123": "Lasting Bender",
 "0124": "Explosive Michael",
 "0134": "Troublesome Jessy",
 "0234": "Scary Walter",
