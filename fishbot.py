@@ -52,23 +52,24 @@ async def roll(ctx, sides: int = 6):
 async def players(ctx):
     await ctx.channel.send(f'Current Player Count: {Player_Count()}')
 
-@bot.command(aliases=['suggestion', 'suggest'])
-async def pool(ctx, text):
+@bot.command(aliases=['suggestion', 'suggest', 'pool', 'vote'])
+async def poll(ctx, text):
         text = ctx.message.content
         text = text[text.find(" "):]
         
         Embed = discord.Embed(colour = 0xFF0000)
-        Embed.set_author(name=f'Pool by {ctx.message.author}', icon_url = f'{ctx.author.avatar_url}')
+        Embed.set_author(name=f'Poll by {ctx.message.author}', icon_url = f'{ctx.author.avatar_url}')
         Embed.add_field(name = 'They are asking: ', value = f'{text.title()}')
         
         message = await ctx.channel.send(embed=Embed)
         await message.add_reaction('👍')
         await message.add_reaction('👎')
 
-@bot.command(aliases=['randclass', 'randomclass'])
-async def RandomClass(ctx, amount: int = 3):
+@bot.command(aliases=['randclass', 'rc'])
+async def randomclass(ctx, amount: int = 3):
     
-    if amount > 5 or 1 > amount: amount = 3
+    if amount > 5: amount = 5
+    elif amount < 1: amount = 1
     
     elements = [
     '<:fire_element:848956850875793440>',
