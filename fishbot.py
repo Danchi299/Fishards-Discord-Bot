@@ -17,6 +17,56 @@ import os
 
 bot = commands.Bot(command_prefix = "-")
 
+global classes, elements
+
+classes = {
+"0":"Fire",
+"1":"Water",
+"2":"Earth",
+"3":"Arcane",
+"4":"Goo",
+
+"00":"Fireball",
+"01":"Push",
+"02":"Meteor",
+"03":"Fireblast",
+"04":"Goo Flame",
+"11":"Frost Ray",
+"12":"Dive",
+"13":"Frost Orb",
+"14":"Heal",
+"22":"Rock Dash",
+"23":"Invincibility",
+"24":"Totem",
+"33":"Arcane Shield",
+"34":"Goo Beam",
+"44":"Grab",
+
+"012": "Classic Fishard",
+"013": "Skillshot Simon",
+"014": "Baby Fancy",
+"023": "Huntin' Henry",
+"024": "Camping Carl",
+"034": "Franz Flammenwerfer",
+"123": "Slippery Sam",
+"124": "Camping Carl",
+"134": "Snipin Snyder",
+"234": "Hidin' Harry",
+
+"0123": "The Last Fishbender",
+"0134": "Double Trouble",
+    
+"01234": "Sensei",
+}
+
+elements = [
+'<:fire_element:848956850875793440>',
+'<:water_element:848956903270121483>',
+'<:earth_element:848956867357966346>',
+'<:arcane_element:848956818516082698>',
+'<:goo_element:848956888153849857>',
+]
+
 #-------------------------------------------------------------------------------------------
 
 #Functions
@@ -69,21 +119,13 @@ async def poll(ctx, text):
         await message.add_reaction('👍')
         await message.add_reaction('👎')
 
-@bot.command(aliases=['randclass', 'rc'])
+@bot.command(aliases=['randclass','randomelement','randelement','randelem','randomspell','randspell', 'r'])
 async def randomclass(ctx, amount: int = 3):
+    global classes, elements
     
     #check if variable is in acceptable range, else make it acceptable
     if amount > 5: amount = 5
     elif amount < 1: amount = 1
-    
-    #list of fishards element emojis
-    elements = [
-    '<:fire_element:848956850875793440>',
-    '<:water_element:848956903270121483>',
-    '<:earth_element:848956867357966346>',
-    '<:arcane_element:848956818516082698>',
-    '<:goo_element:848956888153849857>',
-    ]
     
     text = ''
     fclass = []
@@ -100,11 +142,36 @@ async def randomclass(ctx, amount: int = 3):
     
     fclass.sort() #sort numbers so they are in right element order
     
+    #add class name to message
+    fclass_str = ''
+    for i in fclass: #convert list to str of numbers
+        fclass_str += str(i)
+        
+    try: #find class in global classes
+        text += classes[fclass_str] + " "
+        if amount > 2: text += '\n'
+    except KeyError: None
+
     #make a message with emojis out of number list
     for element in fclass: 
         text  += elements[element] 
     
     await ctx.channel.send(text)
+
+''' WIP
+@bot.command(aliases=['defind','search','class','spell','name'])
+async def find(ctx, text: str = '<:fire_element:848956850875793440><:water_element:848956903270121483><:earth_element:848956867357966346>'):
+    global elements, classes
+    
+    fclass = text
+    text = ''
+    
+    for element in fclass: 
+        text  += elements[element] 
+    
+    try: classes[fclass_str] + " "
+    except KeyError: None
+'''
 
 @bot.command()
 async def wiki(ctx, page: str = 'Home'):
