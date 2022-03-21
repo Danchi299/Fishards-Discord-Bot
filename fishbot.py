@@ -17,7 +17,7 @@ import os
 
 bot = commands.Bot(command_prefix = "-")
 
-global classes, elements
+global classes, elements_emoji
 
 classes = {
 "0":"Fire",
@@ -59,7 +59,7 @@ classes = {
 "01234": "Sensei",
 }
 
-elements = [
+elements_emoji = [
 '<:fire_element:848956850875793440>',
 '<:water_element:848956903270121483>',
 '<:earth_element:848956867357966346>',
@@ -121,7 +121,7 @@ async def poll(ctx, text):
 
 @bot.command(aliases=['randclass','randomelement','randelement','randelem','randomspell','randspell', 'r'])
 async def randomclass(ctx, amount: int = 3):
-    global classes, elements
+    global classes, elements_emoji
     
     #check if variable is in acceptable range, else make it acceptable
     if amount > 5: amount = 5
@@ -134,7 +134,7 @@ async def randomclass(ctx, amount: int = 3):
     for i in range(amount):    
         while 1:
             num = random.randint(0,4)
-            if num in fclass: #check if number was already rolled
+            if num in fclass and amount > 2: #check if number was already rolled
                 None
             else:
                 fclass.append(num) #add number to the list of numbers
@@ -154,24 +154,35 @@ async def randomclass(ctx, amount: int = 3):
 
     #make a message with emojis out of number list
     for element in fclass: 
-        text  += elements[element] 
+        text  += elements_emoji[element] 
     
     await ctx.channel.send(text)
 
-''' WIP
+#prints class/spell name based on sent emojis
 @bot.command(aliases=['defind','search','class','spell','name'])
 async def find(ctx, text: str = '<:fire_element:848956850875793440><:water_element:848956903270121483><:earth_element:848956867357966346>'):
-    global elements, classes
+    global elements_emoji, classes
     
-    fclass = text
-    text = ''
+    old_text = text
     
-    for element in fclass: 
-        text  += elements[element] 
+    #split emojis into list
+    text = text.replace('><', '> <')
+
+    text = text.split()
     
-    try: classes[fclass_str] + " "
-    except KeyError: None
-'''
+    fclass = ''
+    
+    #complare emojis from list with saved emoji list\
+    for element in text:
+    i = -1
+    for emoji in elements_emoji:
+        i += 1
+        if element == emoji:
+            fclass += str(i) #save element numbers to variable
+    
+    #Send Class Name if it exist
+    try: await ctx.channel.send(f'{classes[fclass]} {old_text}')  
+    except KeyError: await ctx.channel.send(f"{old_text} Not Found")
 
 @bot.command()
 async def wiki(ctx, page: str = 'Home'):
