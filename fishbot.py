@@ -146,7 +146,7 @@ async def randomclass(ctx, amount: int = 3, elements = None):
     
     #convert emojis into number ids
     for element in elements:
-    num = -1
+        num = -1
         for emoji in elements_emoji:
             num += 1
             if element == emoji:
@@ -204,11 +204,11 @@ async def find(ctx, text: str = '<:fire_element:848956850875793440><:water_eleme
     
     #complare emojis from list with saved emoji list\
     for element in text:
-        i = -1
+        num = -1
         for emoji in elements_emoji:
-            i += 1
+            num += 1
             if element == emoji:
-                fclass += str(i) #save element numbers to variable
+                fclass += str(num) #save element numbers to variable
 
     #Send Class Name if it exist
     try: await ctx.channel.send(f'{classes[fclass]} {old_text}')  
