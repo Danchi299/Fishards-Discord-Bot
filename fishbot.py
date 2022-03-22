@@ -140,6 +140,9 @@ async def randomclass(ctx, amount: int = 3, elements = None):
     elements = elements.replace('><', '> <')
     elements = elements.split()
     
+    if amount > 2:
+        elements = list(dict.fromkeys(elements))
+    
     text = ''
     fclass = []
     breaker = 0
