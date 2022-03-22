@@ -151,14 +151,9 @@ async def randomclass(ctx, amount: int = 3, elements = None):
             num += 1
             if element == emoji:
                 fclass.append(num) #save element numbers to list
-                print(num)
                 amount -= 1
                 if not amount: breaker = 1; break 
         if breaker: break
-    
-    print(amount)
-    
-    print(fclass)
     
     #make a list of random numbers from 0 to 4
     for i in range(amount):    
@@ -168,12 +163,9 @@ async def randomclass(ctx, amount: int = 3, elements = None):
                 None
             else:
                 fclass.append(num) #add number to the list of numbers
-                print(f'flcass update to {fclass}')
                 break
     
     fclass.sort() #sort numbers so they are in right element order
-    
-    print(fclass)
     
     #add class name to message
     fclass_str = ''
@@ -191,7 +183,6 @@ async def randomclass(ctx, amount: int = 3, elements = None):
     
     await ctx.channel.send(text)
 
-#prints class/spell name based on sent emojis
 @bot.command(aliases=['defind','search','class','spell','name','f'])
 async def find(ctx, text: str = '<:fire_element:848956850875793440><:water_element:848956903270121483><:earth_element:848956867357966346>'):
     global elements_emoji, classes
