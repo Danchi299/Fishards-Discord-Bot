@@ -123,15 +123,37 @@ async def poll(ctx, text):
         await message.add_reaction('👎')
 
 @bot.command(aliases=['randclass','randomelement','randelement','randelem','randomspell','randspell', 'r'])
-async def randomclass(ctx, amount: int = 3):
+async def randomclass(ctx, amount: int = 3, elements = None):
     global classes, elements_emoji
     
     #check if variable is in acceptable range, else make it acceptable
     if amount > 5: amount = 5
     elif amount < 1: amount = 1
     
+    #find first space in message and add everything after it to variable
+    #because passing variables trough commands is wired
+    elements = ctx.message.content
+    elements = elements[elements.find(" "):]
+    elements = elements[elements.find(" "):]
+    
+    #split emojis into list
+    elements = elements.replace('><', '> <')
+    elements = elements.split()
+    
     text = ''
     fclass = []
+    breaker = 0
+    
+    #convert emojis into number ids
+    for element in elements:
+    num = -1
+        for emoji in elements_emoji:
+            num += 1
+            if element == emoji:
+                fclass.append(num) #save element numbers to list
+                amount -= 1
+                if not amount: breaker = 1; break 
+        if breaker: break
     
     #make a list of random numbers from 0 to 4
     for i in range(amount):    
