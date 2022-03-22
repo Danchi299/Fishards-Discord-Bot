@@ -143,6 +143,7 @@ async def randomclass(ctx, amount: int = 3, elements = None):
     text = ''
     fclass = []
     breaker = 0
+    amount_decrease = 0
     
     #convert emojis into number ids
     for element in elements:
@@ -151,15 +152,15 @@ async def randomclass(ctx, amount: int = 3, elements = None):
             num += 1
             if element == emoji:
                 fclass.append(num) #save element numbers to list
-                amount -= 1
+                amount_decrease += 1
                 if not amount: breaker = 1; break 
         if breaker: break
     
     #make a list of random numbers from 0 to 4
-    for i in range(amount):    
+    for i in range(amount-amount_decrease):    
         while 1:
             num = random.randint(0,4)
-            if num in fclass: #check if number was already rolled
+            if num in fclass and amount > 2: #check if number was already rolled
                 None
             else:
                 fclass.append(num) #add number to the list of numbers
