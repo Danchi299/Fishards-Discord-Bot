@@ -11,7 +11,51 @@ import requests
 import random
 import os
 
-#-------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------#
+#                                                                                   #
+#                           ╔══════════════════════════════╗                        #
+#                           ║                              ║                        #
+#                           ║Coding is it's own kind of art║                        #
+#                           ║                              ║                        #
+#                           ║           Fish-art           ║                        #
+#                           ║                              ║                        #
+#                           ╚══════════════════════════════╝                        #
+#                                                                                   #
+#                                   ========     ======                             #
+#                                   =========   ========                            #
+#                                 ======================                            #
+#                             :==++++======================                         #
+#                           --=++++++++++++++++++++++++=====                        #
+#                           +++++++++++++++++++++++++++=====                        #
+#                        :+++++++++++++++++++++++++++++++++=                        #
+#                      :-=++++++++++++************+++++++++=                        #
+#                      =+++++++++++++*############**+++++++=                        #
+#                    ::=+++++++++++++*####******####+++++++=                        #
+#                    ++++++++++++++++*####+====*####+++++++=                        #
+#                    ++++++++++++++++*####*++++*####+++++++=                        #
+#                    +++++++++++++++++**##########**+++++++=                        #
+#                    +++++++++++++++++++**********+++++++++=                        #
+#                    ++++++++++++++++++++++++++++++++++++++=                        #
+#                    ++++++++++++++++++++++++++++++++++++++=                        #
+#                    ++++++++++++++++++++++++++++++++++++++=                        #
+#                    ++++++++++++++++++++++++++++++++++++++=                        #
+#                    +++++++++++++++++++++++++++++++++++++=                         #
+#                    ++++++++++++++++++++++++++++++++++++=                          #
+#                    +++++++++++++++++++++++++++++++++++=                           #
+#                    ++++++++++++++++++++++++++++++++++=                            #
+#                    +++++++++++++++++++++++++++++++++=                             #
+#                     ++++++++++++++++++++++++++++++=                               #
+#                     ++++++++++++++++++++++++++++++=                               #
+#                     +++++++++++++++++++++++++++++++++++++++                       #
+#                 -++++++++++++++++++++++++++++++++++++++++++=                      #
+#              .==++++++++++++++++++++++++++++++++++++++++++=                       #
+#              =+++++++++++++++++++++++++++++++++++++++++++++=                      #
+#       .+++++++++++++++++++++++++        +++++++++++++++++++=                      #
+#        .+++++++++++++++++++++++            ++++++++++++++++=                      #
+#         .+++++++++++++++++++                        .++++++=                      #
+#           .-+++++++++++++                            ..++++=                      #
+#                                                                                   #
+#-----------------------------------------------------------------------------------#
 
 #Global Variables
 
@@ -87,7 +131,10 @@ def Player_Count():
 
 #Commands
     
-@bot.command(aliases=['coin','flop'])
+@bot.command(aliases=['coin','flop'], description='''
+flips a coin and gives you heads or tails
+''')
+
 async def flip(ctx):
     coin = random.getrandbits(1) #Roll Number Between 0 and 1
     
@@ -96,17 +143,23 @@ async def flip(ctx):
     else:
         await ctx.channel.send("Fish Tails")
         
-@bot.command(pass_context=True)
+@bot.command(pass_context=True, description='''
+gives you random number between 1 and 6
+''')
 async def roll(ctx, sides: int = 6):
     if sides < 1: sides = 1
     roll = random.randint(1, sides)#roll a number between 1 and intidure
     await ctx.send(f'Fish God of Randomenss Rolled You a {roll}!')
 
-@bot.command()
+@bot.command(description='''
+Displays current count of players in Fishards
+''')
 async def players(ctx):
     await ctx.channel.send(f'Current Player Count: {Player_Count()}')
 
-@bot.command(aliases=['suggestion', 'suggest', 'pool', 'vote'])
+@bot.command(aliases=['suggestion', 'suggest', 'pool', 'vote'], description='''
+Makes a poll which people can vote in
+''')
 async def poll(ctx, text):
              
         #find first space in message and add everything after it to variable
@@ -122,7 +175,9 @@ async def poll(ctx, text):
         await message.add_reaction('👍')
         await message.add_reaction('👎')
 
-@bot.command(aliases=['randclass','randomelement','randelement','randelem','randomspell','randspell', 'r'])
+@bot.command(aliases=['randclass','randomelement','randelement','randelem','randomspell','randspell', 'r'], description='''
+Gives you random class, spell or element
+''')
 async def randomclass(ctx, amount: int = 3, elements = None):
     global classes, elements_emoji
     
@@ -140,9 +195,11 @@ async def randomclass(ctx, amount: int = 3, elements = None):
     elements = elements.replace('><', '> <')
     elements = elements.split()
     
+    #remove dublicates if its a class
     if amount > 2:
         elements = list(dict.fromkeys(elements))
     
+    #variables
     text = ''
     fclass = []
     breaker = 0
@@ -159,11 +216,11 @@ async def randomclass(ctx, amount: int = 3, elements = None):
                 if not amount: breaker = 1; break 
         if breaker: break
     
-    #make a list of random numbers from 0 to 4
+    #make a list of random numbers between 0 and 4
     for i in range(amount-amount_decrease):    
         while 1:
             num = random.randint(0,4)
-            if num in fclass and amount > 2: #check if number was already rolled
+            if num in fclass and amount > 2: #check if number was already rolled | unless we are randomizing spell
                 None
             else:
                 fclass.append(num) #add number to the list of numbers
@@ -187,7 +244,9 @@ async def randomclass(ctx, amount: int = 3, elements = None):
     
     await ctx.channel.send(text)
 
-@bot.command(aliases=['defind','search','class','spell','name','f'])
+@bot.command(aliases=['defind','search','class','spell','name','f'], description='''
+Displays name of class, spell or element
+''')
 async def find(ctx, text: str = '<:fire_element:848956850875793440><:water_element:848956903270121483><:earth_element:848956867357966346>'):
     global elements_emoji, classes
     
@@ -217,7 +276,9 @@ async def find(ctx, text: str = '<:fire_element:848956850875793440><:water_eleme
     try: await ctx.channel.send(f'{classes[fclass]} {old_text}')  
     except KeyError: await ctx.channel.send(f"{old_text} Not Found")
 
-@bot.command()
+@bot.command(description='''
+Sends link to Fishards Wikipedia
+''')
 async def wiki(ctx, page: str = 'Home'):
     await ctx.channel.send('https://fishards.fandom.com/wiki/'+page)
     
