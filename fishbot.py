@@ -7,6 +7,7 @@ from discord.ext import commands
 from discord.ext import tasks
 
 #Dependencies
+import threading
 import requests
 import random
 import os
@@ -28,8 +29,8 @@ import os
 #                           --=++++++++++++++++++++++++=====                        #
 #                           +++++++++++++++++++++++++++=====                        #
 #                        :+++++++++++++++++++++++++++++++++=                        #
-#                      :-=++++++++++++************+++++++++=                        #
-#                      =+++++++++++++*############**+++++++=                        #
+#                      :-=++++++++++++++**********+++++++++=                        #
+#                      =++++++++++++++**##########**+++++++=                        #
 #                    ::=+++++++++++++*####******####+++++++=                        #
 #                    ++++++++++++++++*####+====*####+++++++=                        #
 #                    ++++++++++++++++*####*++++*####+++++++=                        #
@@ -60,9 +61,21 @@ import os
 #Global Variables
 
 bot = commands.Bot(command_prefix = "-")
+bot.debug = 0
+
 
 global classes, elements_emoji
 
+# List of all element emojis
+elements_emoji = [
+'<:fire_element:848956850875793440>',
+'<:water_element:848956903270121483>',
+'<:earth_element:848956867357966346>',
+'<:arcane_element:848956818516082698>',
+'<:goo_element:848956888153849857>',
+]
+
+# List of all element combinations with names
 classes = {
 "0":"Fire",
 "1":"Water",
@@ -97,28 +110,37 @@ classes = {
 "134": "Snipin Snyder",
 "234": "Hidin' Harry",
 
-"0123": "Lasting Bender",
-"0124": "Explosive Michael",
-"0134": "Troublesome Jessy",
-"0234": "Scary Walter",
-"1234": "Crazy Fred",
+"1234": "Fireless Fred",
+"0234": "Waterless Walter",
+"0134": "Earthless Eric",
+"0124": "Arcanaless Angela",
+"0123": "Gooless Gary",
     
 "01234": "Sensei",
 }
 
-elements_emoji = [
-'<:fire_element:848956850875793440>',
-'<:water_element:848956903270121483>',
-'<:earth_element:848956867357966346>',
-'<:arcane_element:848956818516082698>',
-'<:goo_element:848956888153849857>',
+#List of all random activities for the bot
+# Play | Stream | Watch | Listen
+bot.Activity = [
+"P|Fishards",
+    
+"S|Fishards",
+
+"W|Fishards",
+    
+"L|Onto Land",
+"L|The Lost Wall",
+"L|Fiskdisk",
+"L|Low End Element",
+"L|Half Wizard",
+"L|Boiling Fish Bowl",
 ]
 
 #-------------------------------------------------------------------------------------------
 
 #Functions
 
-def Player_Count():
+def Player_Count(): #returns amount of people currently playing Fishards
     
     headers = {"Client-ID": "F07D7ED5C43A695B3EBB01C28B6A18E5"}
     appId = '1637140' #Fishards
@@ -127,11 +149,32 @@ def Player_Count():
 
     return (str(game_players.json()['response']['player_count']))
 
+
+async def status(activity, text): #Change Bot Status Message
+    
+    if not activity or not text: #if no arguments passed, choose randomly from list
+        activity = bot.Activity[random.randint(0, len(bot.ActivityNames)-1)]
+        activity, text = activity.split('|')
+        
+    if activity == "P": #Playing
+        await bot.change_presence(activity=discord.Game(name = text))
+    elif activity == "S": #Streaming
+        await bot.change_presence(activity=discord.Streaming(name = text, url = "https://www.twitch.tv/rivernotchgamestudio"))
+    elif activity == "L": #Listening
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name = text))
+    elif activity == "W": #Watching
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name = text))
+
+        
+def Thread(): #updates status message each hour
+    threading.Timer(3600, Thread).start() #Run this function each hour
+    status(0, 0) #Change Status Message to a random one
+    
 #-------------------------------------------------------------------------------------------
 
 #Commands
     
-@bot.command(aliases=['coin','flop'], description='''
+@bot.command(aliases=['coin','flip','flop'], description='''
 flips a coin and gives you heads or tails
 ''')
 
@@ -289,13 +332,16 @@ async def wiki(ctx, page: str = 'Home'):
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
+    
+    if bot.debug: status('P','Debugging The Bot')
+    else: Thread()
 
-'''
-@bot.event
-async def on_message(ctx):
-    await bot.process_commands(ctx)
-'''
+if bot.debug:
+    @bot.event
+    async def on_message(ctx):
+        if ctx.channel.id == '841334182554238986':
+            await bot.process_commands(ctx)
 
 #-------------------------------------------------------------------------------------------
-    
+
 bot.run(os.environ['TOKEN'])
