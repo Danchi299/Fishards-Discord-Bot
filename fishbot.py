@@ -168,7 +168,7 @@ async def status(activity, text): #Change Bot Status Message
         
 def Thread(): #updates status message each hour
     threading.Timer(3600, Thread).start() #Run this function each hour
-    status(0, 0) #Change Status Message to a random one
+    await status(0, 0) #Change Status Message to a random one
     
 #-------------------------------------------------------------------------------------------
 
@@ -332,7 +332,7 @@ async def wiki(ctx, page: str = 'Home'):
 async def on_ready():
     print(f'Logged in as {bot.user}')
     
-    if bot.debug: status('P','Debugging The Bot')
+    if bot.debug: await status('P','Debugging The Bot')
     else: Thread()
 
 if bot.debug:
