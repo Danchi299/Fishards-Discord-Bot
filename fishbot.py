@@ -319,11 +319,16 @@ Sends link to Fishards Wikipedia
 async def wiki(ctx, page: str = 'Home'):
     await ctx.channel.send('https://fishards.fandom.com/wiki/'+page)
 
-if bot.debug:
+if bot.debug: #Debug Commands
     @bot.command(aliases = ['1'])
     async def test(ctx):
-        for i in discord.emoji:
+        
+        print()
+        
+        for i in bot.emojis: #Print List of all Emojis
             print(i)
+            
+        print()
     
 #-------------------------------------------------------------------------------------------
 
@@ -333,17 +338,17 @@ if bot.debug:
 async def on_ready():
     print(f'Logged in as {bot.user}')
     
-    if bot.debug: await status('P','Debugging Stuff')
+    if bot.debug: await status('P|Debugging Stuff')
     else: HourlyStatus.start()
 
-if bot.debug:
+if bot.debug: #If Debug Mode ON
     @bot.event
     async def on_message(ctx):
-        if ctx.channel.id == '841334182554238986':
+        if ctx.channel.id == 841334182554238986: #Only Process Commands in Debug Channel
             await bot.process_commands(ctx)
 
 @tasks.loop(hours = 1)
-async def HourlyStatus():
+async def HourlyStatus(): #Change Status to a Random one Each Hour
     await status(None)
             
 #-------------------------------------------------------------------------------------------
