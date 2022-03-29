@@ -7,7 +7,6 @@ from discord.ext import commands
 from discord.ext import tasks
 
 #Dependencies
-import threading
 import requests
 import random
 import os
