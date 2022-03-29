@@ -333,7 +333,7 @@ async def on_ready():
     print(f'Logged in as {bot.user}')
     
     if bot.debug: await status('P','Debugging The Bot')
-    else: Thread()
+    else: await Thread()
 
 if bot.debug:
     @bot.event
