@@ -150,11 +150,12 @@ def Player_Count(): #returns amount of people currently playing Fishards
     return (str(game_players.json()['response']['player_count']))
 
 
-async def status(activity, text): #Change Bot Status Message
+async def status(activity): #Change Bot Status Message
     
-    if not activity or not text: #if no arguments passed, choose randomly from list
+    if not activity: #if no arguments passed, choose randomly from list
         activity = bot.Activity[random.randint(0, len(bot.Activity)-1)]
-        activity, text = activity.split('|')
+    
+    activity, text = activity.split('|')
         
     if activity == "P": #Playing
         await bot.change_presence(activity=discord.Game(name = text))
@@ -165,11 +166,6 @@ async def status(activity, text): #Change Bot Status Message
     elif activity == "W": #Watching
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name = text))
 
-        
-async def Thread(): #updates status message each hour
-    threading.Timer(3600, Thread).start() #Run this function each hour
-    await status(0, 0) #Change Status Message to a random one
-    
 #-------------------------------------------------------------------------------------------
 
 #Commands
@@ -323,6 +319,12 @@ Sends link to Fishards Wikipedia
 ''')
 async def wiki(ctx, page: str = 'Home'):
     await ctx.channel.send('https://fishards.fandom.com/wiki/'+page)
+
+if bot.debug:
+    @bot.command(aliases = ['1'])
+    async def test(ctx):
+        for i in discord.emoji:
+            print(i)
     
 #-------------------------------------------------------------------------------------------
 
@@ -332,8 +334,8 @@ async def wiki(ctx, page: str = 'Home'):
 async def on_ready():
     print(f'Logged in as {bot.user}')
     
-    if bot.debug: await status('P','Debugging The Bot')
-    else: await Thread()
+    if bot.debug: await status('P','Debugging Stuff')
+    else: HourlyStatus.start()
 
 if bot.debug:
     @bot.event
@@ -341,6 +343,10 @@ if bot.debug:
         if ctx.channel.id == '841334182554238986':
             await bot.process_commands(ctx)
 
+@tasks.loop(hours = 1)
+async def HourlyStatus():
+    await status(None)
+            
 #-------------------------------------------------------------------------------------------
 
 bot.run(os.environ['TOKEN'])
