@@ -122,11 +122,14 @@ classes = {
 # Play | Stream | Watch | Listen
 bot.Activity = [
 "P|Fishards",
+"P|FROG Demo",
     
 "S|Fishards",
 
-"W|Fishards",
-    
+"W|Fishards Tournament",
+
+"L|To Sensei",
+"L|Super Idol Fishe", 
 "L|Onto Land",
 "L|The Lost Wall",
 "L|Fiskdisk",
