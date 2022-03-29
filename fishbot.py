@@ -174,10 +174,9 @@ def Thread(): #updates status message each hour
 
 #Commands
     
-@bot.command(aliases=['coin','flip','flop'], description='''
+@bot.command(aliases=['coin','flop'], description='''
 flips a coin and gives you heads or tails
 ''')
-
 async def flip(ctx):
     coin = random.getrandbits(1) #Roll Number Between 0 and 1
     
