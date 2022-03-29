@@ -166,7 +166,7 @@ async def status(activity, text): #Change Bot Status Message
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name = text))
 
         
-def Thread(): #updates status message each hour
+def async Thread(): #updates status message each hour
     threading.Timer(3600, Thread).start() #Run this function each hour
     await status(0, 0) #Change Status Message to a random one
     
