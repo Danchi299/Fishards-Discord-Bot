@@ -153,7 +153,7 @@ def Player_Count(): #returns amount of people currently playing Fishards
 async def status(activity, text): #Change Bot Status Message
     
     if not activity or not text: #if no arguments passed, choose randomly from list
-        activity = bot.Activity[random.randint(0, len(bot.ActivityNames)-1)]
+        activity = bot.Activity[random.randint(0, len(bot.Activity)-1)]
         activity, text = activity.split('|')
         
     if activity == "P": #Playing
@@ -262,7 +262,7 @@ async def randomclass(ctx, amount: int = 3, elements = None):
     for i in range(amount-amount_decrease):    
         while 1:
             num = random.randint(0,4)
-            if num in fclass and amount > 2: #check if number was already rolled | unless we are randomizing spell
+            if num in fclass and amount > 2: #check if numbe was already rolled | unless we are randomizing spell
                 None
             else:
                 fclass.append(num) #add number to the list of numbers
