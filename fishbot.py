@@ -102,7 +102,7 @@ classes = {
 "013": "Skillshot Simon",
 "014": "Baby Fancy",
 "023": "Huntin' Henry",
-"024": "Camping Carl",
+"024": "Brawlin' Bob",
 "034": "Franz Flammenwerfer",
 "123": "Slippery Sam",
 "124": "Camping Carl",
