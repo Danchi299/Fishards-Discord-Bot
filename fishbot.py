@@ -118,7 +118,7 @@ classes = {
 "01234": "Sensei",
 }
 
-'''
+
 #List of all random activities for the bot
 # Play | Stream | Watch | Listen
 bot.Activity = [
@@ -138,7 +138,7 @@ bot.Activity = [
 "L|Half Wizard",
 "L|Boiling Fish Bowl",
 ]
-'''
+
 
 #-------------------------------------------------------------------------------------------
 
@@ -352,10 +352,14 @@ if bot.debug: #If Debug Mode ON
         if ctx.channel.id == 841334182554238986: #Only Process Commands in Debug Channel
             await bot.process_commands(ctx)
 
+savePlayers = '-1'
 @tasks.loop(minutes = 1)
 async def TimedStatus(): #Change Status to a Random one Each Hour
-    text = f'with { Player_Count() } Players in Fishards
-    await bot.change_presence(activity=discord.Game(name = text))
+    players = Player_Count()
+    if players != savePlayers:
+        savePlayers = players
+        text = f'with {players} Players in Fishards
+        await bot.change_presence(activity=discord.Game(name = text))
             
 #-------------------------------------------------------------------------------------------
 
