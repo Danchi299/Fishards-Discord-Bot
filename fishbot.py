@@ -358,7 +358,7 @@ async def TimedStatus(): #Change Status to a Random one Each Hour
     players = Player_Count()
     if players != savePlayers:
         savePlayers = players
-        text = f'with {players} Players in Fishards
+        text = f'with {players} Players in Fishards'
         await bot.change_presence(activity=discord.Game(name = text))
             
 #-------------------------------------------------------------------------------------------
