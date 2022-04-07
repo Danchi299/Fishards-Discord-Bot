@@ -352,12 +352,12 @@ if bot.debug: #If Debug Mode ON
         if ctx.channel.id == 841334182554238986: #Only Process Commands in Debug Channel
             await bot.process_commands(ctx)
 
-savePlayers = '-1'
+bot.savePlayers = '-1'
 @tasks.loop(minutes = 1)
 async def TimedStatus(): #Change Status to a Random one Each Hour
     players = Player_Count()
-    if players != savePlayers:
-        savePlayers = players
+    if players != bot.savePlayers:
+        bot.savePlayers = players
         text = f'with {players} Players in Fishards'
         await bot.change_presence(activity=discord.Game(name = text))
             
