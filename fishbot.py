@@ -60,7 +60,10 @@ import os
 #Global Variables
 
 bot = commands.Bot(command_prefix = "-")
-bot.debug = 0
+bot.queue = []
+bot.queueing = 0
+bot.read_channel = {''}
+bot.voices = {404650697183723530: 'en'}
 
 
 global classes, elements_emoji
@@ -118,26 +121,67 @@ classes = {
 "01234": "Sensei",
 }
 
-
-#List of all random activities for the bot
-# Play | Stream | Watch | Listen
-bot.Activity = [
-"P|Fishards",
-"P|FROG Demo",
-    
-"S|Fishards",
-
-"W|Fishards Tournament",
-
-"L|To Sensei",
-"L|Super Idol Fishe", 
-"L|Onto Land",
-"L|The Lost Wall",
-"L|Fiskdisk",
-"L|Low End Element",
-"L|Half Wizard",
-"L|Boiling Fish Bowl",
-]
+bot.langs = {
+"af": "Afrikaans",
+"ar": "Arabic",
+"bg": "Bulgarian",
+"bn": "Bengali",
+"bs": "Bosnian",
+"ca": "Catalan",
+"cs": "Czech",
+"cy": "Welsh",
+"da": "Danish",
+"de": "German",
+"el": "Greek",
+"en": "English",
+"eo": "Esperanto",
+"es": "Spanish",
+"et": "Estonian",
+"fi": "Finnish",
+"fr": "French",
+"gu": "Gujarati",
+"hi": "Hindi",
+"hr": "Croatian",
+"hu": "Hungarian",
+"hy": "Armenian",
+"id": "Indonesian",
+"is": "Icelandic",
+"it": "Italian",
+"ja": "Japanese",
+"jw": "Javanese",
+"km": "Khmer",
+"kn": "Kannada",
+"ko": "Korean",
+"la": "Latin",
+"lv": "Latvian",
+"mk": "Macedonian",
+"ml": "Malayalam",
+"mr": "Marathi",
+"my": "Myanmar (Burmese)",
+"ne": "Nepali",
+"nl": "Dutch",
+"no": "Norwegian",
+"pl": "Polish",
+"pt": "Portuguese",
+"ro": "Romanian",
+"ru": "Russian",
+"si": "Sinhala",
+"sk": "Slovak",
+"sq": "Albanian",
+"sr": "Serbian",
+"su": "Sundanese",
+"sv": "Swedish",
+"sw": "Swahili",
+"ta": "Tamil",
+"te": "Telugu",
+"th": "Thai",
+"tl": "Filipino",
+"tr": "Turkish",
+"uk": "Ukrainian",
+"ur": "Urdu",
+"vi": "Vietnamese",
+"zh-CN": "Chinese"
+}
 
 
 #-------------------------------------------------------------------------------------------
@@ -323,17 +367,81 @@ Sends link to Fishards Wikipedia
 ''')
 async def wiki(ctx, page: str = 'Home'):
     await ctx.channel.send('https://fishards.fandom.com/wiki/'+page)
+    
+#-------------------------------------------------------------------------------------------
+    
+@bot.command()
+async def join(ctx):
+  voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
+    
+  if voice and voice.is_connected(): await voice.disconnect()
+  
+  if ctx.author.voice: voice = ctx.author.voice.channel
+  else: voice = 0
 
-if bot.debug: #Debug Commands
-    @bot.command(aliases = ['1'])
-    async def test(ctx):
+  if voice:
+    await voice.connect()
+    await ctx.channel.send(f"Joined {voice}")
+  else: await ctx.channel.send("You Are Not In A Voice Channel")
+
+@bot.command()
+async def leave(ctx):
+  voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
+  if voice and voice.is_connected(): await voice.disconnect()
+  else: await ctx.channel.send("Not Connected To Voice Channel")
+
+@bot.command()
+async def stop(ctx, num: int = 1):
+    
+    if num < 0: num = 1
+    elif num > len(bot.queue) or not num:
+        num = 0
+        bot.queue = []
+    
+    for i in range(num - 1): bot.queue.pop(0)
+    
+    voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
+    
+    if voice and voice.is_playing(): voice.stop()
+
+
+@bot.command()
+async def tts(ctx, text):
+    text = text.lower()
+    
+    if text in ['2', 'all']:
+        for channel in ctx.guild.text_channels:
+            bot.read_channel.add(channel) 
+        await ctx.send('Global TTS ON')
         
-        print()
         
-        for i in bot.emojis: #Print List of all Emojis
-            print(i)
+    elif text in ['1', 'on']:
+        bot.read_channel.add(ctx.channel)
+        await ctx.send(f"TTS ON in {ctx.channel}")
+        
+        
+    elif text in ['0', 'off']:
+        try:
+            bot.read_channel.remove(ctx.channel)
+            await ctx.send(f"TTS OFF in {ctx.channel}")
+        except Exception as e: 
+            await ctx.send(f"TTS Was NOT ON in {ctx.channel}")
             
-        print()
+            
+    elif text in ['-1', 'clear', 'stop']:
+        bot.read_channel = {''}
+        await ctx.send("TTS OFF")
+
+
+@bot.command(aliases = ['lang'])
+async def language(ctx, text: str = 'en'):
+
+    if text in bot.langs:
+        bot.voices[ctx.author.id] = text
+        await ctx.send(f'Set Your Language as {text.upper()}')
+        
+    else:
+        await ctx.send(f'{text.upper()} Is Not a Correct Code')
     
 #-------------------------------------------------------------------------------------------
 
@@ -342,16 +450,28 @@ if bot.debug: #Debug Commands
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
+    TimedStatus.start()
+
     
-    if bot.debug: await status('P|Debugging Stuff')
-    else: TimedStatus.start()
+@bot.event
+async def on_message(ctx):
+    if not ctx.author.bot:
+    
+        if ctx.content != None:
+        
+            if ctx.content[0] != prefix and ctx.channel in bot.read_channel:
+            
+                if discord.utils.get(bot.voice_clients, guild=ctx.guild):
+                    bot.queue.append((ctx.content, ctx.author.id))
+                    play_queue(ctx)
+                
+                else:
+                    await ctx.channel.send('Not Connected To Voice Chat\nTurning OFF TTS')
+                    bot.read_channel = {''}
+        
+        await bot.process_commands(ctx)
 
-if bot.debug: #If Debug Mode ON
-    @bot.event
-    async def on_message(ctx):
-        if ctx.channel.id == 841334182554238986: #Only Process Commands in Debug Channel
-            await bot.process_commands(ctx)
-
+            
 bot.savePlayers = '-1'
 @tasks.loop(minutes = 1)
 async def TimedStatus(): #Change Status to a Random one Each Hour
