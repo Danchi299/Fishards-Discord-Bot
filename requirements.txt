@@ -1,3 +1,5 @@
 discord
 discord-ext-bot
 requests
+PyNaCl
+gTTS
