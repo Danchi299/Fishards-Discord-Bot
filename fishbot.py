@@ -1,3 +1,4 @@
+
 print("Loading...")
 
 #Discord
@@ -7,6 +8,7 @@ from discord.ext import commands
 from discord.ext import tasks
 
 #Dependencies
+from gtts import gTTS as gtts
 import requests
 import random
 import os
@@ -59,17 +61,16 @@ import os
 
 #Global Variables
 
-bot = commands.Bot(command_prefix = "-")
+prefix = '-'
+bot = commands.Bot(command_prefix = prefix)
 bot.queue = []
 bot.queueing = 0
 bot.read_channel = {''}
 bot.voices = {404650697183723530: 'en'}
 
 
-global classes, elements_emoji
-
 # List of all element emojis
-elements_emoji = [
+bot.elements_emoji = [
 '<:fire_element:848956850875793440>',
 '<:water_element:848956903270121483>',
 '<:earth_element:848956867357966346>',
@@ -78,7 +79,7 @@ elements_emoji = [
 ]
 
 # List of all element combinations with names
-classes = {
+bot.classes = {
 "0":"Fire",
 "1":"Water",
 "2":"Earth",
@@ -188,6 +189,41 @@ bot.langs = {
 
 #Functions
 
+def save(text, lang: str = 'en'):
+    try: gtts(text, lang = lang).save('gtts.mp3')
+    except: gtts("Error", lang = lang).save('gtts.mp3')
+
+
+def queue_player(ctx):
+    
+    if bot.queue:
+        
+        voice = voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
+        if voice and voice.is_connected():
+            text, id = bot.queue[0]
+            lang = bot.voices.setdefault(id, 'en')
+            save(text, lang)
+            voice.play(discord.FFmpegPCMAudio('gtts.mp3', **{'before_options': ('-channel_layout mono'), 'options': ('-vn', '-loglevel quiet')} ), after = lambda e: After(ctx), )
+            
+        else:
+            bot.queue.pop(0)
+            bot.queueing = 0
+            
+    else: bot.queueing = 0
+        
+        
+def play_queue(ctx):
+    if not bot.queueing:
+        if discord.utils.get(bot.voice_clients, guild=ctx.guild):
+            bot.queueing = 1
+            queue_player(ctx)
+        
+        
+def After(ctx):
+    bot.queue.pop(0)
+    queue_player(ctx)
+
+
 def Player_Count(): #returns amount of people currently playing Fishards
     
     headers = {"Client-ID": "F07D7ED5C43A695B3EBB01C28B6A18E5"}
@@ -196,23 +232,6 @@ def Player_Count(): #returns amount of people currently playing Fishards
     game_players = requests.get(url, headers=headers)#request people currently playing the game
 
     return (str(game_players.json()['response']['player_count']))
-
-
-async def status(activity): #Change Bot Status Message
-    
-    if not activity: #if no arguments passed, choose randomly from list
-        activity = bot.Activity[random.randint(0, len(bot.Activity)-1)]
-    
-    activity, text = activity.split('|')
-        
-    if activity == "P": #Playing
-        await bot.change_presence(activity=discord.Game(name = text))
-    elif activity == "S": #Streaming
-        await bot.change_presence(activity=discord.Streaming(name = text, url = "https://www.twitch.tv/rivernotchgamestudio"))
-    elif activity == "L": #Listening
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name = text))
-    elif activity == "W": #Watching
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name = text))
 
 #-------------------------------------------------------------------------------------------
 
@@ -244,7 +263,7 @@ async def players(ctx):
     await ctx.channel.send(f'Current Player Count: {Player_Count()}')
 
 @bot.command(aliases=['suggestion', 'suggest', 'pool', 'vote'], description='''
-Makes a poll which people can vote in
+Makes a poll in which people can vote 
 ''')
 async def poll(ctx, text):
              
@@ -265,7 +284,6 @@ async def poll(ctx, text):
 Gives you random class, spell or element
 ''')
 async def randomclass(ctx, amount: int = 3, elements = None):
-    global classes, elements_emoji
     
     #check if variable is in acceptable range, else make it acceptable
     if amount > 5: amount = 5
@@ -294,7 +312,7 @@ async def randomclass(ctx, amount: int = 3, elements = None):
     #convert emojis into number ids
     for element in elements:
         num = -1
-        for emoji in elements_emoji:
+        for emoji in bot.elements_emoji:
             num += 1
             if element == emoji:
                 fclass.append(num) #save element numbers to list
@@ -319,14 +337,14 @@ async def randomclass(ctx, amount: int = 3, elements = None):
     for i in fclass: #convert list to str of numbers
         fclass_str += str(i)
         
-    try: #find class in global classes
-        text += classes[fclass_str] + " "
+    try: #find class in global bot.classes
+        text += bot.classes[fclass_str] + " "
         if amount > 2: text += '\n'
     except KeyError: None
 
     #make a message with emojis out of number list
     for element in fclass: 
-        text  += elements_emoji[element] 
+        text  += bot.elements_emoji[element] 
     
     await ctx.channel.send(text)
 
@@ -334,7 +352,6 @@ async def randomclass(ctx, amount: int = 3, elements = None):
 Displays name of class, spell or element
 ''')
 async def find(ctx, text: str = '<:fire_element:848956850875793440><:water_element:848956903270121483><:earth_element:848956867357966346>'):
-    global elements_emoji, classes
     
     #find first space in message and add everything after it to variable
     #because passing variables trough commands is wired
@@ -353,21 +370,23 @@ async def find(ctx, text: str = '<:fire_element:848956850875793440><:water_eleme
     #complare emojis from list with saved emoji list\
     for element in text:
         num = -1
-        for emoji in elements_emoji:
+        for emoji in bot.elements_emoji:
             num += 1
             if element == emoji:
                 fclass += str(num) #save element numbers to variable
 
     #Send Class Name if it exist
-    try: await ctx.channel.send(f'{classes[fclass]} {old_text}')  
+    try: await ctx.channel.send(f'{bot.classes[fclass]} {old_text}')  
     except KeyError: await ctx.channel.send(f"{old_text} Not Found")
 
+"""
 @bot.command(description='''
 Sends link to Fishards Wikipedia
 ''')
 async def wiki(ctx, page: str = 'Home'):
     await ctx.channel.send('https://fishards.fandom.com/wiki/'+page)
-    
+"""    
+
 #-------------------------------------------------------------------------------------------
     
 @bot.command()
@@ -393,10 +412,13 @@ async def leave(ctx):
 @bot.command()
 async def stop(ctx, num: int = 1):
     
-    if num < 0: num = 1
+    if num < 0: 
+        num = 1
+        
     elif num > len(bot.queue) or not num:
         num = 0
         bot.queue = []
+        bot.queueing = 0
     
     for i in range(num - 1): bot.queue.pop(0)
     
@@ -442,7 +464,13 @@ async def language(ctx, text: str = 'en'):
         
     else:
         await ctx.send(f'{text.upper()} Is Not a Correct Code')
-    
+
+@bot.command()
+async def failsafe(ctx):
+    bot.queueing = 0
+    bot.queue =  []
+    discord.utils.get(bot.voice_clients, guild=ctx.guild).stop()
+
 #-------------------------------------------------------------------------------------------
 
 #Events
@@ -455,20 +483,20 @@ async def on_ready():
     
 @bot.event
 async def on_message(ctx):
-    if not ctx.author.bot:
     
-        if ctx.content != None:
-        
-            if ctx.content[0] != prefix and ctx.channel in bot.read_channel:
-            
+    if (ctx.author != bot.user):
+    
+        if (ctx.content != None):
+
+            if not('http' in ctx.content) and not(str(ctx.content)[0] in '!@#$%-+=<') and (ctx.channel in bot.read_channel):
+                
                 if discord.utils.get(bot.voice_clients, guild=ctx.guild):
                     bot.queue.append((ctx.content, ctx.author.id))
                     play_queue(ctx)
                 
                 else:
-                    await ctx.channel.send('Not Connected To Voice Chat\nTurning OFF TTS')
                     bot.read_channel = {''}
-        
+    
         await bot.process_commands(ctx)
 
             
